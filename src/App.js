@@ -10,8 +10,39 @@ import { signInWithPopup, signOut} from "firebase/auth"
 import { auth, googleProvider} from "./config/firebase"
 import NavItem from 'rsuite/esm/Nav/NavItem';
 
+import { useEffect } from 'react';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from './config/firebase';
+
+
+
 
 function App() {
+
+  const [collectionData, setCollectionData] = useState([]);
+  const resourceCollectionRef = collection(db, 'resources');
+
+
+
+  useEffect(()=> {
+    const GetResources = async () => {
+
+      try {
+        const data =  await getDocs(resourceCollectionRef);
+        const cleanedResources = data.docs.map((doc) => ({...doc.data(), id: doc.id,}));
+        console.log(cleanedResources);
+      } catch (err) {
+        console.error(err);
+      }
+
+    };
+
+    GetResources();
+
+}, []);
+
+
+  
   const [page, setPage] = useState("Resources");
   const [loggedIn, setLoggedIn] = useState(false);
 
@@ -35,6 +66,8 @@ function App() {
 
   return (
     <>
+
+    
     <Navbar>
       <Navbar.Brand href="#"><img id="logo" src="logo.png" alt="logo"/></Navbar.Brand>
       <Nav>
@@ -55,6 +88,8 @@ function App() {
     {page === "Resources" ? <Resources/>: <div></div>}
     {page === "My-Contributions" ? <MyContributions/>: <div></div>}
     {page === "Contact" ? <Contact/> : <div></div>}
+
+
     </>
     
   );
